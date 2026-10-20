@@ -14,44 +14,93 @@ datasource db {
 }
 
 
-model Music {
-  id         Int          @id @default(autoincrement())
-  title      String
-  url        String
-  singers    Singer[]
-  categoryId Int
-  category   SongCategory @relation(fields: [categoryId], references: [id])
-  playlists  PlaylistMusic[]
-
-  @@index([title])
-}
-
-model Singer {
-  id     Int     @id @default(autoincrement())
-  name   String @unique
-  musics Music[]
-}
 
 model SongCategory {
-  id       Int     @id @default(autoincrement())
-  category String  @unique
-  musics   Music[]
+  id    Int    @id @default(autoincrement())
+  name  String @unique
+  songs Song[] // ← relation ត្រឡប់
+
+  @@map("song_categories")
 }
+
+
+model Singer {
+  id    Int    @id @default(autoincrement())
+  name  String
+  songs SongSinger[] // ← Relation to the song-singer junction
+
+  @@map("singers")
+}
+
+
+model Product {
+  id     Int     @id @default(autoincrement())
+  name   String  @unique
+  songs  Song[]  // ← relation ត្រឡប់
+
+  @@map("products")
+}
+
 
 model Playlist {
-  id        Int             @id @default(autoincrement())
-  name      String
-  musics    PlaylistMusic[]
-  createdAt DateTime        @default(now())
+  id          Int             @id @default(autoincrement())
+  name        String
+  description String?
+  songs       PlaylistSong[]  // ← Many-to-many through junction
+
+  @@map("playlists")
 }
 
-model PlaylistMusic {
-  playlistId Int
-  musicId    Int
-  position   Int
-  playlist   Playlist @relation(fields: [playlistId], references: [id], onDelete: Cascade)
-  music      Music    @relation(fields: [musicId], references: [id], onDelete: Cascade)
 
-  @@id([playlistId, musicId])
-  @@unique([playlistId, position])
+model PlaylistSong {
+  id         Int      @id @default(autoincrement())
+  playlistId Int
+  songId     Int
+  addedAt    DateTime @default(now())
+  
+  playlist   Playlist @relation(fields: [playlistId], references: [id], onDelete: Cascade)
+  song       Song     @relation(fields: [songId], references: [id], onDelete: Cascade)
+
+  @@unique([playlistId, songId]) // ← មិនអាចបញ្ចូលបទចម្រៀងដូចគ្នា 2 ដង
+  @@map("playlist_songs")
+}
+
+
+model SongSinger {
+  id       Int    @id @default(autoincrement())
+  songId   Int
+  singerId Int
+  
+  song     Song   @relation(fields: [songId], references: [id], onDelete: Cascade)
+  singer   Singer @relation(fields: [singerId], references: [id], onDelete: Cascade)
+
+  @@unique([songId, singerId])
+  @@map("song_singers")
+}
+
+
+model Song {
+  id          Int             @id @default(autoincrement())
+  title       String
+  url         String          @unique // ← URL មិនអាចស្ទួន
+  
+  // Relations
+  productId   Int
+  product     Product         @relation(fields: [productId], references: [id])
+  
+  categoryId  Int
+  category    SongCategory    @relation(fields: [categoryId], references: [id])
+  
+  singers     SongSinger[]    // ← Many-to-many through junction
+  
+  playlists   PlaylistSong[]  // ← Many-to-many through junction
+  
+  // Timestamps
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  // Indexes
+  @@index([title])
+  @@index([categoryId])
+  @@map("songs")
 }

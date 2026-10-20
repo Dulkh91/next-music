@@ -1,4 +1,5 @@
 "use client";
+
 type Music = {
   id: number
   title: string
@@ -9,8 +10,6 @@ type Music = {
 type Singer ={
   name: string
 }
-
-
 
 
 import { useEffect, useState } from "react";
@@ -41,7 +40,9 @@ export default function Home() {
     <main className="min-h-screen">
       {currentSong && (
         <div className="space-y-2">
-          <p>{currentSong.title}</p>
+          <p>
+            {currentSong.title}
+          </p>
 
           <audio
             key={currentSong.id}
@@ -59,9 +60,13 @@ export default function Home() {
           <button
             key={song.id}
             onClick={() => setCurrentIndex(index)}
-            className="block"
+            className={`block`}
           >
             {song.title}
+            {song.singers.map((s)=>(
+              <span key={s.name}>{s.name}</span>
+            ))}
+
           </button>
         ))}
       </div>

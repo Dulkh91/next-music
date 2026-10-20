@@ -29,7 +29,7 @@ export async function GET(
     }
 
     // 1. រកចម្រៀងក្នុង Database
-    const music = await prisma.music.findUnique({
+    const music = await prisma.song.findUnique({
       where: { id: musicId },
     });
 

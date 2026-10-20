@@ -1,27 +1,37 @@
 import { prisma } from "@/lip/prisma";
+
 export async function GET() {
   try {
-    const songs = await prisma.music.findMany({
+    const songs = await prisma.song.findMany({
       select: {
         id: true,
         title: true,
         category: {
-          select: { category: true },
+          select: { name: true },
+        },
+        product:{
+          select: {name: true}
         },
         singers: {
-          select: { name: true },
+          select: {
+            singer: {
+              select: { name: true },
+            },
+          },
         },
       },
       orderBy: { id: "desc" },
     });
 
-    return Response.json(
-      songs.map(({ category, ...song }) => ({
-        ...song,
-        category: category.category,
-        url: `/api/song/${song.id}/streaming`,
-      })),
-    );
+    const songsData = songs.map(({ category, singers,product, ...song }) => ({
+      ...song,
+      category: category.name,
+      product: product.name,
+      singers: singers.map(({ singer }) => ({ name: singer.name })),
+      url: `/api/song/${song.id}/streaming`,
+    }));
+
+    return Response.json(songsData);
   } catch (error) {
     console.error("Failed to fetch songs:", error);
 

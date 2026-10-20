@@ -31,6 +31,7 @@ export default function AudioUploader() {
     const formData = new FormData();
     formData.append('audio', file);
 
+  
     try {
       const response = await fetch('/api/upload', {
         method: 'POST',
@@ -68,7 +69,7 @@ export default function AudioUploader() {
         accept="audio/*"
         onChange={handleUpload}
         disabled={uploading}
-        className="hidden"
+        
       />
 
       <button
