@@ -47,6 +47,7 @@ export default function SelectedCategory({ value, onChange }: SelectedCategoryPr
              disabled
              >ជ្រើសរើសប្រភេទចម្រៀង
              </option>
+             
             {category.map((c)=>(
                 <option key={c.id} value={c.name}>
                     {c.name}

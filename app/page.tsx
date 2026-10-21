@@ -25,7 +25,7 @@ export default function Home() {
         return r.json();
       })
       .then(setSongs)
-      .catch(console.error);
+      .catch((e)=>console.error(e));
   }, []);
 
   const currentSong = songs[currentIndex];
@@ -48,7 +48,7 @@ export default function Home() {
             key={currentSong.id}
             src={currentSong.url}
             controls
-            preload="none"
+            preload="metadata‍"
             autoPlay
             onEnded={playNextSong}
           />
@@ -69,7 +69,7 @@ export default function Home() {
 
           </button>
         ))}
-      </div>
+      </div>    
     </main>
   );
 }
