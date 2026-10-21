@@ -24,7 +24,7 @@ export async function GET() {
             );
         }
         const songs = await oldSong.json()
-        const resultSongs = songs.map((s)=>(
+        const resultSongs = songs.map((s:any)=>(
             {
                 "title": s[0],
                 "singer": s[1]? s[1]: "unknow",
