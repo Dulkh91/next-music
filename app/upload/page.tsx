@@ -1,9 +1,9 @@
 "use client";
 
 import { FormEvent, useEffect, useRef, useState } from "react";
-import SelectField from "@/app/component/SelectField";
-import SelectedCategory from "../component/SelectedCategory";
-import SelectStar from "../component/SelectStar";
+import SelectField from "@/components/SelectField";
+import SelectedCategory from "../../components/SelectedCategory";
+import SelectStar from "../../components/SelectStar";
 
 type Singer = { id: number; name: string };
 type Product = {id: number, name:string}
