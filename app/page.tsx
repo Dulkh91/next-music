@@ -21,6 +21,8 @@ import TitleSong from "@/components/TitleSong";
 import ProgressBar from "@/components/ProgressBar";
 import MediaControl from "@/components/MediaControl";
 import CardLists from "@/components/CardLists";
+import GraphPlaySound from "@/components/GrapPlaySound";
+
 
 export default function Home() {
   const [songs, setSongs] = useState<Music[]>([]);
@@ -171,7 +173,6 @@ export default function Home() {
           {currentSong && (
             <audio
               ref={audioRef}
-              key={currentSong.url}
               src={currentSong.url}
               autoPlay={isPlaying}
               onEnded={playNextSong}
@@ -221,6 +222,9 @@ export default function Home() {
         </div>
 
       </div>
+          {currentSong && (
+            <GraphPlaySound audioRef={audioRef} isPlaying={isPlaying} />
+          )}
     </main>
   );
 }
