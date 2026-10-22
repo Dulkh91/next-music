@@ -1,3 +1,5 @@
+'use client'
+
 import { Disc } from "lucide-react"
 
 interface CurrentSong {

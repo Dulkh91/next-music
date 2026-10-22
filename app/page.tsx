@@ -21,10 +21,13 @@ import TitleSong from "@/components/TitleSong";
 import ProgressBar from "@/components/ProgressBar";
 import MediaControl from "@/components/MediaControl";
 import CardLists from "@/components/CardLists";
+import { getSelectedMusicApi, musicCategories, useMusicCategory } from "@/lib/musicCategory";
 
 
 export default function Home() {
   const [songs, setSongs] = useState<Music[]>([]);
+  const selectedApi = useMusicCategory();
+  const category = musicCategories.find((item) => item.api === selectedApi)?.title ?? "សម័យ";
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState<boolean>(true);
   
@@ -33,14 +36,52 @@ export default function Home() {
   const audioRef = useRef<HTMLAudioElement | null>(null)
 
   useEffect(() => {
-    // fetch("/api/song")
-    fetch("/api/oldsong")
-      .then((r) => {
-        if (!r.ok) throw new Error("Failed to fetch song api");
-        return r.json();
+    let controller = new AbortController();
+
+    const loadSongs = async (api: string) => {
+      controller.abort();
+      controller = new AbortController();
+      setSongs([]);
+      setCurrentIndex(0);
+      setCurrentTime(0);
+      setDuration(0);
+      setIsPlaying(true);
+
+      try {
+        const response = await fetch(api, { signal: controller.signal });
+        if (!response.ok) throw new Error(`Failed to fetch ${api}`);
+        setSongs(await response.json());
+      } catch (error) {
+        if (error instanceof DOMException && error.name === "AbortError") return;
+        console.error(error);
+      }
+    };
+
+    const handleCategoryChange = (event: Event) => {
+      const { api } = (event as CustomEvent<{ api: string }>).detail;
+      void loadSongs(api);
+    };
+
+    const initialApi = getSelectedMusicApi();
+    const initialController = new AbortController();
+    controller = initialController;
+    fetch(initialApi, { signal: initialController.signal })
+      .then((response) => {
+        if (!response.ok) throw new Error(`Failed to fetch ${initialApi}`);
+        return response.json();
       })
       .then(setSongs)
-      .catch((e)=>console.error(e));
+      .catch((error) => {
+        if (error instanceof DOMException && error.name === "AbortError") return;
+        console.error(error);
+      });
+
+    window.addEventListener("music-category-change", handleCategoryChange);
+
+    return () => {
+      controller.abort();
+      window.removeEventListener("music-category-change", handleCategoryChange);
+    };
   }, []);
 
   const currentSong = songs[currentIndex];
@@ -146,69 +187,70 @@ export default function Home() {
   
 
   return (
-    <main className="min-h-screen bg-slate-950 text-white p-4 sm:p-8 flex justify-center items-center font-sans">
-      <div className="w-full max-w-4xl grid grid-cols-1 md:grid-cols-12 gap-6 bg-slate-900/80 backdrop-blur-md p-6 rounded-3xl border border-slate-800 shadow-2xl">
+    // <main className="min-h-screen bg-slate-950 text-white p-4 sm:p-8 flex justify-center items-center font-sans">
+
+      <div className="w-full max-w-4xl grid grid-cols-1 md:items-center md:grid-cols-12 gap-6 bg-slate-900/80 backdrop-blur-md p-6 rounded-3xl border border-slate-800 shadow-2xl">
         
         {/* ផ្នែក Music Player */}
-        <div className="md:col-span-5 flex flex-col items-center justify-between bg-slate-800/50 p-6 rounded-2xl border border-slate-700/50">
-          <div className="w-full text-center space-y-4">
+            <div className="md:col-span-5 flex flex-col h-[60%] items-center justify-between bg-slate-800/50 p-6 rounded-2xl border border-slate-700/50">
+            <div className="w-full text-center space-y-4">
 
-            {/* រូប Disk Animation */}
-            {currentSong &&<>
-              <DiskAnimate
-                 currentSong={{
-                  title: currentSong.title,
-                  coverUrl: currentSong.coverUrl,
-                  isPlaying: isPlaying
-                  
-                 }}
+              {/* រូប Disk Animation */}
+              {currentSong &&<>
+                <DiskAnimate
+                  currentSong={{
+                    title: currentSong.title,
+                    coverUrl: currentSong.coverUrl,
+                    isPlaying: isPlaying
+                    
+                  }}
+                />
+
+                {/* ពត៌មានបទចម្រៀង */}
+                <TitleSong title={currentSong.title} singers={currentSong.singers}/>
+                </>}
+            </div>
+
+            {/* Audio Element & Events */}
+            {currentSong && (
+              <audio
+                ref={audioRef}
+                src={currentSong.url}
+                autoPlay={isPlaying}
+                onEnded={playNextSong}
+                onPlay={() => {
+                  setIsPlaying(true)
+                }}
+                onPause={() => setIsPlaying(false)}
+                onTimeUpdate={() => setCurrentTime(audioRef.current?.currentTime || 0)}
+                onLoadedMetadata={() =>setDuration(audioRef.current?.duration || 0)}
+                className="hidden"
               />
+            )}
 
-              {/* ពត៌មានបទចម្រៀង */}
-              <TitleSong title={currentSong.title} singers={currentSong.singers}/>
-              </>}
+            {/* ប៊ូតុងបញ្ជា និង Progress Bar */}
+            <div className="w-full mt-4 space-y-3">
+              {/* Progress Bar */}
+              <ProgressBar
+                duration={duration}
+                currentTime={currentTime}
+                handleProgressChange={()=>handleProgressChange}
+              />
+            
+              {/* Media Controls */}
+              <MediaControl
+                playPrevSong={playPrevSong}
+                togglePlay={togglePlay}
+                isPlaying
+                playNextSong={playNextSong}
+              />
+            </div>
           </div>
-
-          {/* Audio Element & Events */}
-          {currentSong && (
-            <audio
-              ref={audioRef}
-              src={currentSong.url}
-              autoPlay={isPlaying}
-              onEnded={playNextSong}
-              onPlay={() => {
-                setIsPlaying(true)
-              }}
-              onPause={() => setIsPlaying(false)}
-              onTimeUpdate={() => setCurrentTime(audioRef.current?.currentTime || 0)}
-              onLoadedMetadata={() =>setDuration(audioRef.current?.duration || 0)}
-              className="hidden"
-            />
-          )}
-
-          {/* ប៊ូតុងបញ្ជា និង Progress Bar */}
-          <div className="w-full mt-4 space-y-3">
-            {/* Progress Bar */}
-            <ProgressBar
-              duration={duration}
-              currentTime={currentTime}
-              handleProgressChange={()=>handleProgressChange}
-            />
-          
-            {/* Media Controls */}
-            <MediaControl
-              playPrevSong={playPrevSong}
-              togglePlay={togglePlay}
-              isPlaying
-              playNextSong={playNextSong}
-            />
-          </div>
-        </div>
 
         {/* ផ្នែក Playlist បទចម្រៀងទាំងអស់ */}
         <div className="md:col-span-7 flex flex-col">
           <h3 className="text-lg font-semibold mb-4 text-slate-200 flex items-center gap-2">
-            <Music className="w-5 h-5 text-purple-400" /> បញ្ជីបទចម្រៀងចាស់ៗ ({songs.length})
+            <Music className="w-5 h-5 text-purple-400" /> បញ្ជីបទចម្រៀង{category} ({songs.length})
           </h3>
 
           <CardLists
@@ -223,7 +265,7 @@ export default function Home() {
         </div>
 
       </div>
-    </main>
+    // </main>
   );
 }
 

@@ -1,3 +1,4 @@
+'use client'
 type Product = { id: number; name: string };
 
 type SelectFieldProps = {

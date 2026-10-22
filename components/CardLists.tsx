@@ -23,7 +23,7 @@ type SingerProp = {
 
 export default function CardLists({songs, isPlaying, currentIndex, audioRef, setCurrentIndex, setIsPlaying}: SongsProp){
     return(
-        <div className="flex-1 max-h-[380px] overflow-y-auto space-y-2 pr-2 scrollbar-thin scrollbar-thumb-slate-700">
+        <div className="flex-1 max-h-[650] min-h-[500] overflow-y-auto space-y-2 pr-2 scrollbar-thin scrollbar-thumb-slate-700">
                     {songs.map((song, index) => {
                       const isActive = index === currentIndex;
                       return (

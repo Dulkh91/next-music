@@ -1,3 +1,5 @@
+'use client'
+
 import { SkipBack, SkipForward,Pause, Play } from "lucide-react"
 
 type MediaControl = {
