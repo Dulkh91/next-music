@@ -2,20 +2,12 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { getAudioGraph } from "./audioGraph";
 
 interface GraphPlayProps {
   audioRef: React.RefObject<HTMLAudioElement | null>;
   isPlaying: boolean;
 }
-
-type AudioGraph = {
-  context: AudioContext;
-  analyser: AnalyserNode;
-};
-
-// A media element can only be wrapped in one MediaElementAudioSourceNode.
-// Keep its graph so effect re-runs (including React Strict Mode) reuse it.
-const audioGraphs = new WeakMap<HTMLAudioElement, AudioGraph>();
 
 export default function GraphPlaySound({
   audioRef,
@@ -28,29 +20,8 @@ export default function GraphPlaySound({
     const audio = audioRef.current;
     if (!audio) return;
 
-    const AudioContextClass =
-      window.AudioContext ||
-      (window as typeof window & {
-        webkitAudioContext?: typeof AudioContext;
-      }).webkitAudioContext;
-
-    if (!AudioContextClass) return;
-
-    let graph = audioGraphs.get(audio);
-    if (!graph) {
-      const context = new AudioContextClass();
-      const analyser = context.createAnalyser();
-
-      analyser.fftSize = 256;
-      analyser.smoothingTimeConstant = 0.8;
-
-      const source = context.createMediaElementSource(audio);
-      source.connect(analyser);
-      analyser.connect(context.destination);
-
-      graph = { context, analyser };
-      audioGraphs.set(audio, graph);
-    }
+    const graph = getAudioGraph(audio);
+    if (!graph) return;
 
     const { context, analyser } = graph;
     audioContextRef.current = context;
@@ -89,7 +60,7 @@ export default function GraphPlaySound({
 
   return (
     <div className="ml-2 flex h-12 items-end gap-0.5">
-      {Array.from({ length: 24 }, (_, index) => (
+      {Array.from({ length:25 }, (_, index) => (
         <span
           key={index}
           ref={(element) => {

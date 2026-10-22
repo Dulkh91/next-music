@@ -1,11 +1,13 @@
 "use client"
 
+import React from "react";
 import GraphPlay from "./GraphPlay";
 
 interface SongsProp{
     songs: SongProp[]
     isPlaying: boolean
     currentIndex: number
+    audioRef: React.RefObject<HTMLAudioElement | null>
     setCurrentIndex: (value: number)=>void
     setIsPlaying: (value: boolean)=> void
 }
@@ -18,7 +20,8 @@ type SingerProp = {
     name :string
 }
 
-export default function CardLists({songs, isPlaying, currentIndex,setCurrentIndex,setIsPlaying}:SongsProp){
+
+export default function CardLists({songs, isPlaying, currentIndex, audioRef, setCurrentIndex, setIsPlaying}: SongsProp){
     return(
         <div className="flex-1 max-h-[380px] overflow-y-auto space-y-2 pr-2 scrollbar-thin scrollbar-thumb-slate-700">
                     {songs.map((song, index) => {
@@ -49,7 +52,10 @@ export default function CardLists({songs, isPlaying, currentIndex,setCurrentInde
                           </div>
         
                           {isActive && isPlaying && (
-                            <GraphPlay/>
+                            <GraphPlay
+                                audioRef={audioRef}
+                                isPlaying={isPlaying}
+                            />
                           )}
                         </button>
                       );

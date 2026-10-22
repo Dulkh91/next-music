@@ -27,7 +27,7 @@ export async function GET() {
         const resultSongs = songs.map((s:any)=>(
             {
                 "title": s[0],
-                "singer": s[1]? s[1]: "unknow",
+                "singers": s[1] ? [{ name: s[1] }] : [{ name: "unknow" }],
                 "url": `/api/oldsong/${s[2]}`.trim()
             }
         ))

@@ -5,7 +5,7 @@ type Music = {
   title: string
   url: string
   singers:    Singer[]
-  category: string
+  category?: string
   coverUrl?: string
 }
 type Singer ={
@@ -21,7 +21,6 @@ import TitleSong from "@/components/TitleSong";
 import ProgressBar from "@/components/ProgressBar";
 import MediaControl from "@/components/MediaControl";
 import CardLists from "@/components/CardLists";
-import GraphPlaySound from "@/components/GrapPlaySound";
 
 
 export default function Home() {
@@ -34,7 +33,8 @@ export default function Home() {
   const audioRef = useRef<HTMLAudioElement | null>(null)
 
   useEffect(() => {
-    fetch("/api/song")
+    // fetch("/api/song")
+    fetch("/api/oldsong")
       .then((r) => {
         if (!r.ok) throw new Error("Failed to fetch song api");
         return r.json();
@@ -213,18 +213,16 @@ export default function Home() {
 
           <CardLists
             songs={songs}
-            isPlaying
+            isPlaying={isPlaying}
             currentIndex={currentIndex}
             setCurrentIndex={setCurrentIndex}
             setIsPlaying={setIsPlaying}
+            audioRef={audioRef}
           />
 
         </div>
 
       </div>
-          {currentSong && (
-            <GraphPlaySound audioRef={audioRef} isPlaying={isPlaying} />
-          )}
     </main>
   );
 }
