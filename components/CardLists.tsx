@@ -10,6 +10,10 @@ interface SongsProp{
     audioRef: React.RefObject<HTMLAudioElement | null>
     setCurrentIndex: (value: number)=>void
     setIsPlaying: (value: boolean)=> void
+    hasMore: boolean
+    loadingMore: boolean
+    loadMoreError: string | null
+    onLoadMore: () => void
 }
 type SongProp = {
     title: string
@@ -21,9 +25,18 @@ type SingerProp = {
 }
 
 
-export default function CardLists({songs, isPlaying, currentIndex, audioRef, setCurrentIndex, setIsPlaying}: SongsProp){
+export default function CardLists({songs, isPlaying, currentIndex, audioRef, setCurrentIndex, setIsPlaying, hasMore, loadingMore, loadMoreError, onLoadMore}: SongsProp){
+
     return(
-        <div className="flex-1 max-h-[650] min-h-[500] overflow-y-auto space-y-2 pr-2 scrollbar-thin scrollbar-thumb-slate-700">
+        <div
+          className="flex-1 max-h-[650px] min-h-[500px] overflow-y-auto space-y-2 pr-2 scrollbar-thin scrollbar-thumb-slate-700"
+          onScroll={(event) => {
+            const element = event.currentTarget;
+            if (hasMore && element.scrollHeight - element.scrollTop - element.clientHeight < 120) {
+              onLoadMore();
+            }
+          }}
+        >
                     {songs.map((song, index) => {
                       const isActive = index === currentIndex;
                       return (
@@ -60,6 +73,13 @@ export default function CardLists({songs, isPlaying, currentIndex, audioRef, set
                         </button>
                       );
                     })}
+                    {loadingMore && <p className="py-3 text-center text-sm text-slate-400">កំពុងផ្ទុកបទបន្ថែម...</p>}
+                    {loadMoreError && (
+                      <div role="alert" className="flex items-center justify-between gap-3 rounded-lg bg-red-500/10 p-3 text-sm text-red-300">
+                        <span>ផ្ទុកបទបន្ថែមមិនបាន៖ {loadMoreError}</span>
+                        <button type="button" onClick={onLoadMore} className="underline">ព្យាយាមម្ដងទៀត</button>
+                      </div>
+                    )}
                   </div>
     )
 }

@@ -3,7 +3,7 @@
 type ProgressBarProp = {
     duration: number
     currentTime: number
-    handleProgressChange: ()=>void
+    handleProgressChange: React.ChangeEventHandler<HTMLInputElement>
 }
 
 export default function ProgressBar({duration,currentTime, handleProgressChange}:ProgressBarProp){
@@ -27,7 +27,7 @@ export default function ProgressBar({duration,currentTime, handleProgressChange}
               <div className="flex justify-between text-xs text-slate-400">
                 <span>{formatTime(currentTime)}</span>
                 <span>{formatTime(duration)}</span>
-              </div>
             </div>
+        </div>
     )
 }

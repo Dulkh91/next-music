@@ -15,7 +15,7 @@ interface DiskAnimateProp{
 export default function DiskAnimate({currentSong}: DiskAnimateProp){
 
     return(
-        <div className="relative w-40 h-40 mx-auto mt-2 hidden md:flex items-center justify-center">
+        <div className="relative w-40  h-40 mx-auto mt-2 hidden md:flex items-center justify-center">
               <div
                 className={`w-full h-full rounded-full bg-line-to-tr from-purple-600 to-indigo-500 p-1 shadow-lg shadow-purple-500/30 ${
                   currentSong.isPlaying ? "animate-spin" : ""

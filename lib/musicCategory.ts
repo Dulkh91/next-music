@@ -3,19 +3,20 @@
 import { useSyncExternalStore } from "react"
 
 export const musicCategories = [
-  { title: "សម័យ", api: "/api/song" },
   { title: "បុរាណ", api: "/api/oldsong" },
+  { title: "សម័យ", api: "/api/song" },
 ] as const
 
 const storageKey = "music-category"
 const defaultApi = musicCategories[0].api
 const categoryChangeEvent = "music-category-change"
+export type MusicApi = (typeof musicCategories)[number]["api"]
 
-function isMusicApi(value: string | null): value is (typeof musicCategories)[number]["api"] {
+function isMusicApi(value: string | null): value is MusicApi {
   return musicCategories.some((category) => category.api === value)
 }
 
-function getSnapshot() {
+function getSnapshot(): MusicApi {
   try {
     const savedApi = localStorage.getItem(storageKey)
     return isMusicApi(savedApi) ? savedApi : defaultApi
@@ -41,11 +42,11 @@ export function useMusicCategory() {
   return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot)
 }
 
-export function getSelectedMusicApi() {
+export function getSelectedMusicApi(): MusicApi {
   return getSnapshot()
 }
 
-export function selectMusicCategory(api: (typeof musicCategories)[number]["api"]) {
+export function selectMusicCategory(api: MusicApi) {
   try {
     localStorage.setItem(storageKey, api)
   } catch {
