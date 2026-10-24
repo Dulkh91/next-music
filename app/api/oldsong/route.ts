@@ -12,7 +12,7 @@ export async function GET(request: Request) {
             )
         }
 
-        const oldSong = await fetch(apiUrl)
+        const oldSong = await fetch(`https://script.google.com/macros/s/${apiUrl}/exec`)
 
         if(!oldSong.ok){
             return Response.json(

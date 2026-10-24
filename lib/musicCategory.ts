@@ -4,7 +4,9 @@ import { useSyncExternalStore } from "react"
 
 export const musicCategories = [
   { title: "បុរាណ", api: "/api/oldsong" },
-  { title: "សម័យ", api: "/api/song" },
+  {title: "សម័យ", api: "/api/mixapi"},
+  {title: "ប្រពៃណី", api: "/api/customsong"}
+  // { title: "សម័យ", api: "/api/song" },
 ] as const
 
 const storageKey = "music-category"

@@ -17,6 +17,7 @@ interface SongsProp{
 }
 type SongProp = {
     title: string
+    product: string
     singers: SingerProp[]
 }
 
@@ -52,15 +53,19 @@ export default function CardLists({songs, isPlaying, currentIndex, audioRef, set
                               : "bg-slate-800/40 hover:bg-slate-800 text-slate-300 border border-transparent"
                           }`}
                         >
-                          <div className="flex items-center gap-3 overflow-hidden">
-                            <span className={`text-sm font-semibold w-6 text-center ${isActive ? "text-purple-400" : "text-slate-500"}`}>
+                          <div className="flex items-center gap-3 overflow-hidden w-full">
+                            {/* <span className={`text-sm font-semibold w-6 text-center ${isActive ? "text-purple-400" : "text-slate-500"}`}>
                               {index + 1}
-                            </span>
-                            <div className="truncate">
+                            </span> */}
+                            <div className="truncate w-full">
                               <p className={`font-medium truncate ${isActive ? "text-purple-200 font-semibold" : "group-hover:text-white"}`}>
                                 {song.title}
                               </p>
-                              <p className="text-xs text-slate-400 truncate">{song.singers.map(s=>s.name)}</p>
+                              <div className=" w-full flex justify-between text-slate-400 text-xs  truncate">
+                                <p>{song.singers.map(s=>s.name)}</p>
+                                {song.product && <p >{song.product}</p>}
+                                <p>{index+1}</p>
+                              </div>
                             </div>
                           </div>
         
