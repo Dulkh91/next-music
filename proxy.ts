@@ -1,6 +1,10 @@
 import { NextResponse, type NextRequest } from "next/server"
 
 export function proxy(request: NextRequest) {
+  if (request.nextUrl.pathname === "/ads.txt") {
+    return NextResponse.rewrite(new URL("/Ads.txt", request.url))
+  }
+
   if (request.nextUrl.pathname === "/oldsong") {
     return NextResponse.redirect(new URL("/", request.url))
   }
@@ -19,5 +23,5 @@ export function proxy(request: NextRequest) {
 
 export const config = {
   
-  matcher: ["/api/:path*", "/oldsong","/upload"],
+  matcher: ["/api/:path*", "/oldsong", "/upload", "/ads.txt"],
 }
