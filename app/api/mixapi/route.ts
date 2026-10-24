@@ -1,5 +1,4 @@
 import { prisma } from "@/lip/prisma";
-import { error } from "console";
 
 type SongItem = {
   id?: number;
@@ -58,7 +57,7 @@ export async function GET(request: Request) {
         singers: song.SINGER
           ? [{ name: String(song.SINGER) }]
           : [{ name: "មិនស្គាល់" }],
-        rytm: String(song.SONG_RHYTM ?? ""),
+        // rytm: String(song.SONG_RHYTM ?? ""),
         url: `/api/mixapi/${encodeURIComponent(getDriveFileId(song.SONG_URL))}/streaming`,
       }),
     );

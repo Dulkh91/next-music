@@ -4,6 +4,7 @@ type Music = {
   id: number
   title: string
   url: string
+  product: string
   singers:    Singer[]
   category?: string
   coverUrl?: string
