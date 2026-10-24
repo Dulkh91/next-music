@@ -28,6 +28,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
+      <meta name="google-adsense-account" content="ca-pub-5085498185887835"></meta>
       <body className="min-h-screen bg-slate-950 text-white p-4 sm:p-8 ">
           <Script
             async
