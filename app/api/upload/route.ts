@@ -1,7 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getCurrentUser } from "@/lib/auth";
 
 export async function POST(request: NextRequest) {
     try {
+        if (!(await getCurrentUser())) {
+            return NextResponse.json({ error: "Please log in first." }, { status: 401 });
+        }
+
         const botToken = process.env.TELEGRAM_BOT_TOKEN;
         const chatId = process.env.TELEGRAM_CHAT_ID;
 

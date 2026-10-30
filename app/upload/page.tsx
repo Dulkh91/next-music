@@ -1,9 +1,10 @@
 "use client";
 
-import { FormEvent, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import SelectField from "@/components/SelectField";
 import SelectedCategory from "../../components/SelectedCategory";
 import SelectStar from "../../components/SelectStar";
+import Login from "@/components/Login";
 
 type Singer = { id: number; name: string };
 type Product = {id: number, name:string}
@@ -20,31 +21,48 @@ export default function UploadSong() {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
+  const [authStatus, setAuthStatus] = useState<"checking" | "signed-in" | "signed-out">("checking");
 
   useEffect(() => {
-    fetch("/api/singer")
-      .then(async (response) => {
-        if (!response.ok) throw new Error("មិនអាចទាញបញ្ជីតារាចម្រៀងបានទេ");
-        return (await response.json()) as Singer[];
-      })
-      .then(setSingers)
-      .catch((err: unknown) => {
-        setError(err instanceof Error ? err.message : "មានបញ្ហាក្នុងការទាញទិន្នន័យ");
-      });
+    let cancelled = false;
 
-      fetch("/api/product")
-      .then(async (r)=>{
-        if(!r.ok) throw new Error("មិនអាចទាញបញ្ជីផលិតកម្មបានទេ")
-            return await r.json()
-      })
-      .then(setProduct)
-      .catch((err: unknown)=>{
-        setError(err instanceof Error? err.message: "មានបញ្ហាក្នុងការទាញទិន្នន័យ នៃផលិតកម្ម")
-      })
+    async function checkSession() {
+      try {
+        const response = await fetch("/api/auth/me");
+        if (!cancelled) setAuthStatus(response.ok ? "signed-in" : "signed-out");
+      } catch {
+        if (!cancelled) setAuthStatus("signed-out");
+      }
+    }
 
+    void checkSession();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+  useEffect(() => {
+    if (authStatus !== "signed-in") return;
+
+    async function loadOptions() {
+      try {
+        const [singerResponse, productResponse] = await Promise.all([
+          fetch("/api/singer"),
+          fetch("/api/product"),
+        ]);
+        if (!singerResponse.ok) throw new Error("មិនអាចទាញបញ្ជីតារាចម្រៀងបានទេ");
+        if (!productResponse.ok) throw new Error("មិនអាចទាញបញ្ជីផលិតកម្មបានទេ");
+        setSingers((await singerResponse.json()) as Singer[]);
+        setProduct((await productResponse.json()) as Product[]);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "មានបញ្ហាក្នុងការទាញទិន្នន័យ");
+      }
+    }
+
+    void loadOptions();
+  }, [authStatus]);
+
+  const handleSubmit = async (event: React.SubmitEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError("");
     setMessage("");
@@ -119,6 +137,14 @@ export default function UploadSong() {
   };
 
   
+  if (authStatus === "checking") {
+    return <main className="flex min-h-screen items-center justify-center bg-black/40"><span className="loading loading-spinner loading-xl"></span></main>;
+  }
+
+  if (authStatus === "signed-out") {
+    return <Login onLoginSuccess={() => setAuthStatus("signed-in")} />;
+  }
+
   return (
     <main className="min-h-screen px-4 py-10">
       <form onSubmit={handleSubmit} className="mx-auto max-w-xl space-y-5 rounded-xl bg-gray-800 p-6 shadow">

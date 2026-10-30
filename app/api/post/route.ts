@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lip/prisma";
+import { getCurrentUser } from "@/lib/auth";
 
 type CreateSongBody = {
   title?: unknown;
@@ -10,6 +11,10 @@ type CreateSongBody = {
 };
 
 export async function POST(request: Request) {
+  if (!(await getCurrentUser())) {
+    return NextResponse.json({ error: "Please log in first." }, { status: 401 });
+  }
+
   let body: CreateSongBody;
 
   try {

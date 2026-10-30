@@ -23,5 +23,5 @@ export function proxy(request: NextRequest) {
 
 export const config = {
   
-  matcher: ["/api/:path*", "/oldsong", "/upload", "/ads.txt"],
+  matcher: ["/api/:path*", "/oldsong", "/ads.txt"],
 }
